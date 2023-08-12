@@ -8,7 +8,7 @@
 #define TX_LEN 66
 
 // length of outgoing/incoming messages
-#define DATA_LEN 30
+#define DATA_LEN 42
 #define CMD_LEN  66
 
 // Master CAN ID ///
@@ -426,14 +426,19 @@ void control()
     spi_data.qd_abad[0] = l1_state.a.v;
     spi_data.qd_hip[0] = l1_state.h.v;
     spi_data.qd_knee[0] = l1_state.k.v;
-    
+    spi_data.tau_abad[0] = l1_state.a.t;
+    spi_data.tau_hip[0] = l1_state.h.t;
+    spi_data.tau_knee[0] = l1_state.k.t;
+
     spi_data.q_abad[1] = l2_state.a.p;
     spi_data.q_hip[1] = l2_state.h.p;
     spi_data.q_knee[1] = l2_state.k.p;
     spi_data.qd_abad[1] = l2_state.a.v;
     spi_data.qd_hip[1] = l2_state.h.v;
     spi_data.qd_knee[1] = l2_state.k.v;
-    
+    spi_data.tau_abad[1] = l2_state.a.t;
+    spi_data.tau_hip[1] = l2_state.h.t;
+    spi_data.tau_knee[1] = l2_state.k.t;
     
     
     if(estop==0){
@@ -502,7 +507,7 @@ void control()
         //PackAll();
         //WriteAll();
     }
-    spi_data.checksum = xor_checksum((uint32_t*)&spi_data,14);
+    spi_data.checksum = xor_checksum((uint32_t*)&spi_data,20);
     for(int i = 0; i < DATA_LEN; i++){
         tx_buff[i] = ((uint16_t*)(&spi_data))[i];}
     
@@ -520,13 +525,17 @@ void test_control()
         spi_data.qd_abad[i] = spi_command.qd_des_abad[i] + 1.f;
         spi_data.qd_knee[i] = spi_command.qd_des_knee[i] + 1.f;
         spi_data.qd_hip[i]  = spi_command.qd_des_hip[i]  + 1.f;
+
+        spi_data.tau_abad[i] = spi_command.tau_abad_ff[i] + 1.f;
+        spi_data.tau_knee[i] = spi_command.tau_knee_ff[i] + 1.f;
+        spi_data.tau_hip[i]  = spi_command.tau_hip_ff[i]  + 1.f;
     }
     
     spi_data.flags[0] = 0xdead;
     //spi_data.flags[1] = 0xbeef;
     
     // only do first 56 bytes of message.
-    spi_data.checksum = xor_checksum((uint32_t*)&spi_data,14);
+    spi_data.checksum = xor_checksum((uint32_t*)&spi_data,20);
     
     for(int i = 0; i < DATA_LEN; i++)
         tx_buff[i] = ((uint16_t*)(&spi_data))[i];

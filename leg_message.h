@@ -5,20 +5,32 @@
 
 // 60 bytes
 // 30 16-bit words
+
+// 84 bytes
+// 42 16-bit words
+// 21 32-bit words
 struct spi_data_t
 {
+    //position
     float q_abad[2];
     float q_hip[2];
     float q_knee[2];
+    //velocity  
     float qd_abad[2];
     float qd_hip[2];
     float qd_knee[2];
+    //torque
+    float tau_abad[2];
+    float tau_hip[2];
+    float tau_knee[2];
+    //flags
     int32_t flags[2];
     int32_t checksum;
 };
 
 // 132 bytes
 // 66 16-bit words
+// 33 32-bit words
 struct spi_command_t
 {
     float q_des_abad[2];
